@@ -1,0 +1,9 @@
+# import library
+export `cat */.env_config | xargs`
+
+# command run docker container
+docker-compose up --build --remove-orphans -d mysql redis
+# docker-compose up --build --remove-orphans -d mysql redis php_myadmin
+
+# command run elk stack container
+# docker-compose -f docker-compose.elk.yml up --build -d

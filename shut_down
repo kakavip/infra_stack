@@ -1,0 +1,4 @@
+export `cat */.env_config | xargs`
+docker-compose down
+
+

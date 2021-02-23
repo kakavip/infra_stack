@@ -1,0 +1,53 @@
+version: "3.7"
+services:
+  elasticsearch:
+    container_name: elasticsearch
+    build: ./elasticsearch
+    environment:
+      ES_JAVA_OPTS: "-Xms512m -Xmx512m"
+      discovery.type: single-node
+    volumes:
+      - elastic_data:/usr/share/elasticsearch/data
+    ports:
+      - ${ELASTIC_PORT}:9200
+      - 9300:9300
+    networks:
+      - elk_net
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+
+  kibana:
+    container_name: kibana
+    build: ./kibana
+    env_file: ./kibana/.env
+    ports:
+      - ${KIBANA_PORT}:5601
+    networks:
+      - elk_net
+    expose:
+      - 5601
+    depends_on:
+      - elasticsearch
+
+  logstash:
+    container_name: logstash
+    build: ./logstash
+    volumes:
+      - ./logstash:/logstash_dir
+    command: logstash -f /logstash_dir/logstash.conf
+    depends_on:
+      - elasticsearch
+    ports:
+      - ${LOGSTASH_PORT}:5959
+    expose:
+      - 5959
+
+networks:
+  elk_net:
+    driver: overlay
+
+volumes:
+  elastic_data:
+  logstash_data:

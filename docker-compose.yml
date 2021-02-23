@@ -1,0 +1,112 @@
+version: "3.7"
+services:
+  mysql:
+    container_name: mysql
+    restart: always
+    # image: mysql:5.7
+    build: ./mysql
+    env_file: ${ENV_MYSQL_PATH}/.env
+    volumes:
+      - mysql_infra_data:/var/lib/mysql
+    ports:
+      - ${DATABASE_PORT}:3306
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --default-authentication-plugin=mysql_native_password
+
+    networks:
+      - default
+  redis:
+    container_name: redis
+    image: redis:5.0.7
+    build: ./redis
+    restart: always
+    ports:
+      - ${REDIS_PORT}:6379
+    volumes:
+      - redis_data:/data
+    networks:
+      - default
+
+  redis-stat:
+    container_name: redis-stat
+    build: ./redis-stat
+    ports:
+      - 63790:63790
+    networks:
+      - default
+
+  rabbitmq:
+    container_name: rabbitmq
+    build: ./rabbitmq
+    # image: rabbitmq:3.6
+    restart: always
+    ports:
+      - ${RABBITMQ_PORT}:5672
+      - ${RABBITMQ_UI_PORT}:15672
+    networks:
+      - default
+    env_file: ./rabbitmq/.env
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+  nginx:
+    container_name: nginx
+    build: ./nginx
+    # image: nginx:1.17.8
+    restart: always
+    ports:
+      - ${NGINX_PORT}:80
+    env_file: ./nginx/.env
+    networks:
+      - default
+  jaeger:
+    container_name: jaeger
+    # restart: always
+    # image: jaegertracing/all-in-one:1.17
+    build: ./jaeger
+    networks:
+      - default
+    env_file: ./jaeger/.env
+    volumes:
+      - jaeger_data:/tmp
+    ports:
+      - 5775:5775/udp
+      - 6831:6831/udp
+      - 6832:6832/udp
+      - 5778:5778
+      - ${JEAGER_PORT}:16686
+      - 14268:14268
+      - 14250:14250
+      - 9411:9411
+
+  jupyterlab:
+    container_name: jupyterlab
+    build: ./jupyterlab
+    ports:
+      - ${JUPYTERLAB_PORT}:8888
+    volumes:
+      - jupyterlab_data:/opt/app/data
+    entrypoint: sh -c 'jupyter lab --ip=0.0.0.0 --port=8888 --no-browser --notebook-dir=/opt/app/data --allow-root'
+
+  php_myadmin:
+    container_name: php_myadmin
+    image: phpmyadmin/phpmyadmin
+    restart: always
+    environment:
+      PMA_HOST: mysql
+      MYSQL_ROOT_PASSWORD: 123789
+    ports:
+      - 8085:80
+    networks:
+      - default
+    depends_on:
+      - mysql
+
+networks:
+  default:
+    driver: overlay
+    attachable: true
+volumes:
+  mysql_infra_data:
+  redis_data:
+  rabbitmq_data:
+  jaeger_data:
+  jupyterlab_data:

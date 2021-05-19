@@ -1,9 +1,14 @@
 # import library
 export `cat */.env_config | xargs`
 
-# command run docker container
-docker-compose up --build --remove-orphans -d mysql redis
-# docker-compose up --build --remove-orphans -d mysql redis php_myadmin
-
-# command run elk stack container
-# docker-compose -f docker-compose.elk.yml up --build -d
+if [ $1 = "basic" ] || [ -e $1 ]; then
+    # command run docker container
+    docker-compose up --build --remove-orphans -d mysql redis rabbitmq php_myadmin jaeger
+    # docker-compose up --build --remove-orphans -d mysql redis php_myadmin
+elif [ $1 = "elk" ]; then
+    # command run elk stack container
+    docker-compose -f docker-compose.elk.yml up --build -d
+elif [ $1 = "dockprom" ]; then
+    # command run dockprom monitor stack
+    cd dockprom && docker-compose up -d && cd ..
+fi

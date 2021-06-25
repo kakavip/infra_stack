@@ -100,6 +100,16 @@ services:
     depends_on:
       - mysql
 
+  ignite:
+    container_name: ignite
+    build: ./ignite
+    ports:
+      - 10800:10800
+      - 11211:11211
+    volumes:
+      - ./ignite/default.xml:/opt/ignite/apache-ignite/config/default-config.xml
+      - ignite_data:/var/lib/ignite/storage
+
 networks:
   default:
     driver: overlay
@@ -110,3 +120,4 @@ volumes:
   rabbitmq_data:
   jaeger_data:
   jupyterlab_data:
+  ignite_data:

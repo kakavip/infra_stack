@@ -18,3 +18,7 @@ FLUSH PRIVILEGES;
 CREATE DATABASE IF NOT EXISTS social_network CHARACTER SET utf8 COLLATE utf8_general_ci;
 GRANT ALL PRIVILEGES ON social_network.* TO 'sn_user' @'%' IDENTIFIED BY "123789xxx";
 FLUSH PRIVILEGES;
+-- create database ignite cache
+CREATE DATABASE IF NOT EXISTS ignite_db CHARACTER SET utf8 COLLATE utf8_general_ci;
+GRANT ALL PRIVILEGES ON ignite_db.* TO 'ignite_user' @'%' IDENTIFIED BY "123789xxx";
+FLUSH PRIVILEGES;
